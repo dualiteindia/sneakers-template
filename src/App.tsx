@@ -77,7 +77,6 @@ const featuredProducts: Product[] = [
 ];
 
 const newArrivals: Product[] = [
-  { id: 7, name: "Eagle High Top", price: "$225.00", images: SET_7 },
   { id: 8, name: "Mesa Runner", price: "$180.00", images: SET_1 },
   { id: 9, name: "Sage Brush Low", price: "$160.00", images: SET_2 },
   { id: 10, name: "Dusk Patrol", price: "$195.00", images: SET_3 },
