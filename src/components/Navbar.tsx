@@ -1,0 +1,208 @@
+import { useState } from "react";
+import { ShoppingBag, Search, User, ChevronDown } from "lucide-react";
+import { useScroll, useMotionValueEvent } from "framer-motion";
+import { cn } from "../lib/utils";
+
+interface NavbarProps {
+  onNavigate: (page: string) => void;
+  currentPage: string;
+}
+
+// Mock data for dropdown thumbnails (reusing existing assets)
+const DROPDOWN_THUMBS = {
+  everyday: [
+    "https://69sfgmk1pv2omedb.public.blob.vercel-storage.com/new-templates/sneakers/ChatGPT-Image-Jan-28-2026-01_18_25-AM.webp",
+    "https://69sfgmk1pv2omedb.public.blob.vercel-storage.com/new-templates/sneakers/ChatGPT-Image-Jan-28-2026-11_11_55-PM.webp",
+  ],
+  functional: [
+    "https://69sfgmk1pv2omedb.public.blob.vercel-storage.com/new-templates/sneakers/ChatGPT-Image-Jan-29-2026-02_10_17-AM.webp",
+    "https://69sfgmk1pv2omedb.public.blob.vercel-storage.com/new-templates/sneakers/ChatGPT-Image-Jan-29-2026-02_10_30-AM.webp",
+  ],
+  design: [
+    "https://69sfgmk1pv2omedb.public.blob.vercel-storage.com/new-templates/sneakers/ChatGPT-Image-Jan-29-2026-02_10_26-AM.webp",
+    "https://69sfgmk1pv2omedb.public.blob.vercel-storage.com/new-templates/sneakers/ChatGPT-Image-Jan-29-2026-02_10_44-AM.webp",
+  ],
+};
+
+export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
+  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 10);
+  });
+
+  const navLinks = [
+    { name: "Bestsellers", id: "bestsellers" },
+    { name: "Made for USA", id: "made-for-usa" },
+    { name: "Sneakers", id: "sneakers", hasDropdown: true },
+    { name: "Slides", id: "slides" },
+    { name: "Apparel", id: "apparel" },
+    { name: "Accessories", id: "accessories" }, // Placeholder page
+    { name: "Story", id: "story" }, // Placeholder page
+  ];
+
+  return (
+    <nav
+      className={cn(
+        "sticky top-0 z-40 transition-all duration-300 ease-in-out px-6 md:px-8 h-[80px] flex items-center border-b border-transparent",
+        isScrolled
+          ? "bg-heritage-bone/95 backdrop-blur-sm border-heritage-charcoal/5"
+          : "bg-heritage-bone"
+      )}
+      onMouseLeave={() => setActiveDropdown(null)}
+    >
+      <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between">
+        {/* LEFT: Logo */}
+        <div
+          className="flex-shrink-0 cursor-pointer"
+          onClick={() => onNavigate("home")}
+        >
+          <h1 className="font-sans text-2xl md:text-3xl tracking-[0.05em] font-extrabold text-heritage-charcoal uppercase">
+            KANIEN
+          </h1>
+        </div>
+
+        {/* CENTER: Navigation Links */}
+        <div className="hidden lg:flex items-center gap-8 h-full">
+          {navLinks.map((link) => (
+            <div
+              key={link.name}
+              className="h-full flex items-center group relative"
+              onMouseEnter={() =>
+                link.hasDropdown && setActiveDropdown(link.id)
+              }
+            >
+              <button
+                onClick={() => !link.hasDropdown && onNavigate(link.id)}
+                className={cn(
+                  "flex items-center gap-1 text-sm font-bold transition-colors uppercase tracking-wide h-full",
+                  currentPage === link.id
+                    ? "text-heritage-clay"
+                    : "text-heritage-charcoal hover:text-heritage-clay"
+                )}
+              >
+                {link.name}
+                {link.hasDropdown && (
+                  <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                )}
+              </button>
+
+              {/* MEGA MENU DROPDOWN */}
+              {link.hasDropdown && activeDropdown === link.id && (
+                <div
+                  className="fixed top-[80px] left-0 w-full bg-heritage-bone border-t border-b border-heritage-charcoal/5 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 z-50"
+                  onMouseEnter={() => setActiveDropdown(link.id)}
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
+                  <div className="max-w-[1600px] mx-auto px-8 py-12">
+                    <div className="grid grid-cols-3 gap-12">
+                      {/* Column 1: Everyday */}
+                      <div
+                        className="cursor-pointer group/col"
+                        onClick={() => {
+                          onNavigate("everyday");
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        <h3 className="font-sans text-lg font-extrabold text-heritage-charcoal uppercase tracking-wide mb-6 border-b border-heritage-charcoal/10 pb-2 group-hover/col:text-heritage-clay transition-colors">
+                          Everyday Sneakers
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          {DROPDOWN_THUMBS.everyday.map((img, i) => (
+                            <div
+                              key={i}
+                              className="aspect-[4/3] bg-white p-2 border border-heritage-charcoal/5"
+                            >
+                              <img
+                                src={img}
+                                alt="Everyday"
+                                className="w-full h-full object-contain mix-blend-multiply"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Column 2: Functional */}
+                      <div
+                        className="cursor-pointer group/col"
+                        onClick={() => {
+                          onNavigate("functional");
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        <h3 className="font-sans text-lg font-extrabold text-heritage-charcoal uppercase tracking-wide mb-6 border-b border-heritage-charcoal/10 pb-2 group-hover/col:text-heritage-clay transition-colors">
+                          Functional Sneakers
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          {DROPDOWN_THUMBS.functional.map((img, i) => (
+                            <div
+                              key={i}
+                              className="aspect-[4/3] bg-white p-2 border border-heritage-charcoal/5"
+                            >
+                              <img
+                                src={img}
+                                alt="Functional"
+                                className="w-full h-full object-contain mix-blend-multiply"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Column 3: Design-led */}
+                      <div
+                        className="cursor-pointer group/col"
+                        onClick={() => {
+                          onNavigate("design-led");
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        <h3 className="font-sans text-lg font-extrabold text-heritage-charcoal uppercase tracking-wide mb-6 border-b border-heritage-charcoal/10 pb-2 group-hover/col:text-heritage-clay transition-colors">
+                          Design-led Sneakers
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          {DROPDOWN_THUMBS.design.map((img, i) => (
+                            <div
+                              key={i}
+                              className="aspect-[4/3] bg-white p-2 border border-heritage-charcoal/5"
+                            >
+                              <img
+                                src={img}
+                                alt="Design-led"
+                                className="w-full h-full object-contain mix-blend-multiply"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* RIGHT: Icons */}
+        <div className="flex items-center gap-6">
+          <button className="text-heritage-charcoal hover:text-heritage-clay transition-colors">
+            <User className="w-6 h-6 stroke-[1.5]" />
+          </button>
+          <button className="text-heritage-charcoal hover:text-heritage-clay transition-colors">
+            <Search className="w-6 h-6 stroke-[1.5]" />
+          </button>
+          <button className="relative text-heritage-charcoal hover:text-heritage-clay transition-colors">
+            <ShoppingBag className="w-6 h-6 stroke-[1.5]" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-heritage-clay text-white text-[9px] flex items-center justify-center rounded-full font-bold">
+              0
+            </span>
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
